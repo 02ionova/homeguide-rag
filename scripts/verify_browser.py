@@ -18,7 +18,9 @@ def main():
         errors = []
         page.on('pageerror', lambda exc: errors.append(str(exc)))
         page.goto(args.url)
-        expect(page.locator('.appliance-button')).to_have_count(3)
+        expect(page.locator('.appliance-button')).to_have_count(5)
+        expect(page.locator('#appliance-count')).to_have_text('05')
+        expect(page.locator('.document-link')).to_have_count(5)
         expect(page.locator('#model-label')).to_have_text('Bosch WAV28EH3GB')
         expect(page.locator('.suggestion')).to_have_count(2)
         assert not page.evaluate('document.documentElement.scrollWidth > innerWidth')
@@ -81,14 +83,42 @@ def main():
         pending.pop().abort('failed')
         expect(page.locator('.message.error')).to_contain_text('Cannot connect')
         page.locator('#new-chat').click()
+        # New documents have independent models, suggested questions and PDF routes.
+        for appliance, model, filename, physical_page, excerpt in [
+            ('oven', 'Bosch HBG936C.1 family', 'Bosch-HBG936C.1-Oven.pdf', 18,
+             'The childproof lock can be activated regardless of whether the appliance is on or off. Press and hold for approx. 4 seconds.'),
+            ('microwave', 'Bosch BFL524MB2', 'Bosch-BFL524MB2-Microwave.pdf', 9,
+             'Use heat-resistant, microwave-safe glass, glass ceramic, porcelain, temperature-resistant plastic or fully glazed ceramic without cracks.'),
+        ]:
+            page.locator(f'[data-id="{appliance}"]').click()
+            expect(page.locator('#model-label')).to_have_text(model)
+            expect(page.locator('.suggestion')).to_have_count(2)
+            assert page.locator(f'[data-id="{appliance}"] svg').count() == 1
+            page.locator('.suggestion').first.click()
+            expect(page.locator('.loading')).to_be_visible()
+            request = pending.pop()
+            assert request.request.post_data_json['appliance'] == appliance
+            new_source = {**source, 'filename': filename, 'page': physical_page,
+                          'appliance': appliance, 'model': model, 'text': excerpt,
+                          'url': f'/manuals/{appliance}#page={physical_page}'}
+            request.fulfill(status=200, content_type='application/json', body=json.dumps({
+                'answer': f'Mocked manual-specific answer. [{filename}, p. {physical_page}]',
+                'status': 'answered', 'sources': [new_source]}))
+            expect(page.locator('.message.assistant .citation')).to_have_attribute('href', new_source['url'])
+            pdf_response = page.request.get(f'{args.url}/manuals/{appliance}')
+            assert pdf_response.ok and pdf_response.body().startswith(b'%PDF')
+            page.locator('#new-chat').click()
+        page.screenshot(path=str(output / 'five-appliances.png'), full_page=True, animations='disabled')
         # Mobile navigation, keyboard access, model switch, and overflow checks.
         for width, height in [(390, 844), (320, 740), (768, 1024)]:
             page.set_viewport_size({'width': width, 'height': height})
             if width <= 760:
-                page.locator('#menu-toggle').click()
-                expect(page.locator('#menu-toggle')).to_have_attribute('aria-expanded', 'true')
-                page.locator('[data-id="washing-machine"]').click()
-                expect(page.locator('#menu-toggle')).to_have_attribute('aria-expanded', 'false')
+                for appliance in ('washing-machine', 'oven', 'microwave'):
+                    page.locator('#menu-toggle').click()
+                    expect(page.locator('#menu-toggle')).to_have_attribute('aria-expanded', 'true')
+                    page.locator(f'[data-id="{appliance}"]').click()
+                    expect(page.locator('#menu-toggle')).to_have_attribute('aria-expanded', 'false')
+                    expect(page.locator(f'[data-id="{appliance}"]')).to_have_attribute('aria-pressed', 'true')
             assert not page.evaluate('document.documentElement.scrollWidth > innerWidth'), f'Overflow at {width}px'
             page.screenshot(path=str(output / f'mobile-{width}.png'), full_page=True, animations='disabled')
         assert not errors, errors

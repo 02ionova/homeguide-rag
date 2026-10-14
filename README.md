@@ -1,6 +1,6 @@
 # HomeGuide
 
-A calm, English-language chat application for owners of three Bosch household appliances. Ask about operation, maintenance or troubleshooting; HomeGuide retrieves the selected manual's pages and asks an LLM to answer with clickable citations such as `[Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]`. Both a FastAPI web interface and a Python CLI are included. No frontend build tools are needed.
+A calm, English-language chat application for owners of five Bosch household appliances. Ask about operation, maintenance or troubleshooting; HomeGuide retrieves the selected manual's pages and asks an LLM to answer with clickable citations such as `[Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]`. Both a FastAPI web interface and a Python CLI are included. No frontend build tools are needed.
 
 ## Supported documents
 
@@ -11,8 +11,10 @@ The original files in the workspace were inspected before implementation. All pa
 | Washing machine | Bosch WAV28EH3GB | `Bosch-WAV28EH3GB-Washing-Machine.pdf` | 60 | 1–57, 60 | 137 |
 | Dishwasher | Bosch SMS8ZDI86M | `Bosch-SMS8ZDI86M-Dishwasher.pdf` | 56 | 1–52, 56 | 140 |
 | Coffee machine | Bosch TIS 3.3. family | `Bosch-TIS-3.3-Coffee-Machine.pdf` | 176 | 1, 5–26 | 69 |
+| Oven | Bosch HBG936C.1 family | `Bosch-HBG936C.1-Oven.pdf` | 44 | 1–44 | 197 |
+| Microwave | Bosch BFL524MB2 | `Bosch-BFL524MB2-Microwave.pdf` | 24 | 1–24 | 93 |
 
-The washing and dishwasher manuals are English. The coffee manual also contains French, Dutch, Polish, Czech, Russian and German; only English and the shared cover are embedded. Shared coffee diagram pages 2–4 remain available in the original PDF but contain no meaningful extractable text. Blank/manufacturer backmatter pages outside the selected ranges are excluded. No OCR was needed. The coffee cover identifies a family, not a more precise model; the app does not assume one.
+The washing machine, dishwasher, oven and microwave manuals are English. The coffee manual also contains French, Dutch, Polish, Czech, Russian and German; only English and the shared cover are embedded. Shared coffee diagram pages 2–4 remain available in the original PDF but contain no meaningful extractable text. Blank/manufacturer backmatter pages outside the selected ranges are excluded. No OCR was needed. The coffee and oven covers identify model/family patterns, not more precise variants; the app does not assume one. Oven and microwave control symbols sometimes disappear from text extraction, so answers must point to the original control-panel illustration when needed.
 
 `documents.json` records page ranges, safety pages, related procedure pages, model names, original SHA-256 hashes and example questions. It is the allowlist for ingestion and PDF serving. Original PDFs are never modified.
 
@@ -54,7 +56,7 @@ Restart the server after changing configuration. The default MiniLM model produc
 
 ## Ingest, ask and run
 
-The three supplied manuals already exist locally. On a fresh checkout, obtain them from the official links below and save them in `pdfs/` under the readable filenames in the supported-documents table. Bosch's original download filenames differ; the PDF contents must remain unchanged.
+The five supplied manuals already exist locally. On a fresh checkout, obtain them from the official links below and save them in `pdfs/` under the readable filenames in the supported-documents table. Bosch's original download filenames differ; the PDF contents must remain unchanged.
 
 ```bash
 # Ingest all registered PDFs from pdfs/; repeat runs are idempotent.
@@ -68,6 +70,8 @@ python -m scripts.query --appliance washing-machine "How do I activate the washi
 python -m scripts.query --appliance dishwasher "How do I clean the dishwasher filter?"
 python -m scripts.query --appliance coffee-machine "How do I start the coffee machine’s cleaning programme?"
 python -m scripts.query --appliance coffee-machine --json "What should I check if coffee flows slowly?"
+python -m scripts.query --appliance oven "How do I use the oven’s cleaning aid?"
+python -m scripts.query --appliance microwave "Which cookware can I use in the microwave?"
 
 # Retrieval diagnostics: real embeddings, no LLM key/API cost.
 python -m scripts.query --appliance dishwasher --sources-only "How do I clean the dishwasher filter?"
@@ -88,7 +92,7 @@ In PyCharm, select **Settings → Project → Python Interpreter → Add Local I
 
 ## Verified example questions and citations
 
-These questions were checked against actual extracted text and real semantic retrieval. The child-lock question was also verified with a live OpenAI answer after fixing citation formatting. Broader live answer evaluation is pending explicit approval for the additional API calls; local retrieval checks cover all six suggested questions plus informal and misspelled variants. Expected citations list the supporting physical pages; a complete answer may also cite relevant supplied safety pages.
+These questions were checked against actual extracted text and real semantic retrieval. The child-lock question was also verified with a live OpenAI answer after fixing citation formatting. Broader live answer evaluation is pending explicit approval for the additional API calls; local retrieval checks cover all ten suggested questions plus informal and misspelled variants. Expected citations list the supporting physical pages; a complete answer may also cite relevant supplied safety pages.
 
 | Question | Expected supporting citations | Support checked |
 |---|---|---|
@@ -98,8 +102,12 @@ These questions were checked against actual extracted text and real semantic ret
 | How often should I run Machine Care? | `[Bosch-SMS8ZDI86M-Dishwasher.pdf, p. 39]` | On reminder; every 2 months for appliances without a reminder, without tableware |
 | How do I start the coffee machine’s cleaning programme? | `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 21]`, `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 22]` | Calc’nClean start and complete procedure, approximately 40 minutes, cleaning/descaling precautions |
 | What should I check if coffee flows slowly? | `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 23]`, `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 15]` | Possible fine grind, limescale or air in filter; grinding adjustment only while grinder runs; never reach into grinder |
+| How do I activate the oven’s childproof lock? | `[Bosch-HBG936C.1-Oven.pdf, p. 18]`, `[Bosch-HBG936C.1-Oven.pdf, p. 6]` | Approximately 4 seconds, whether on or off; graphical button identity requires the original control-panel illustration |
+| How do I use the oven’s cleaning aid? | `[Bosch-HBG936C.1-Oven.pdf, p. 24]` | Fully cooled compartment, remove accessories, 0.4 litres water with a drop of washing-up liquid, no distilled water, wipe and dry afterward |
+| Which cookware can I use in the microwave? | `[Bosch-BFL524MB2-Microwave.pdf, p. 9]` | Heat-resistant microwave-safe materials; specific spoon exception requires at least 2 cm clearance from walls/inside of door |
+| How do I clean the microwave turntable? | `[Bosch-BFL524MB2-Microwave.pdf, p. 13]` | Remove, wash with hot soapy water and soft cloth, dry and reinsert with correct engagement |
 
-A question absent from all three manuals is **“What is tomorrow’s weather in Prague?”** Expected answer:
+A question absent from all five manuals is **“What is tomorrow’s weather in Prague?”** Expected answer:
 
 > I don’t know based on the provided documents.
 
@@ -114,7 +122,7 @@ Press and hold the two buttons labelled “Child Lock push 3 sec.” for approxi
 the machine is switched off. [Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]
 ```
 
-**Actual local ingestion result:** 346 chunks (137 washing machine, 140 dishwasher, 69 coffee machine) across 134 text-bearing pages. Repeating ingestion returned `status: unchanged`, the same collection, and the same chunk count. See [manual-support evaluation](docs/ANSWER_EVALUATION.md) and [verification record](docs/VERIFICATION.md) for the practical limits of these checks.
+**Actual local ingestion result:** 636 chunks (137 washing machine, 140 dishwasher, 69 coffee machine, 197 oven, 93 microwave) across 202 text-bearing pages. Repeating ingestion returned `status: unchanged`, the same collection, and the same chunk count. See [manual-support evaluation](docs/ANSWER_EVALUATION.md) and [verification record](docs/VERIFICATION.md) for the practical limits of these checks.
 
 ## How the RAG pipeline works
 
@@ -160,7 +168,7 @@ Default pytest discovers only `tests/`, preserving the unrelated root exercise. 
 
 ## Limitations
 
-- **Limited live LLM evaluation:** a live child-lock answer was verified after the citation fix. The six suggested questions, six informal/typo retrieval variants, generation error paths and browser interactions have local/mocked checks. Broader live model-output evaluation awaits approval for additional billable requests.
+- **Limited live LLM evaluation:** a live child-lock answer was verified after the citation fix. The ten suggested questions, six informal/typo retrieval variants, generation error paths and browser interactions have local/mocked checks. Broader live model-output evaluation awaits approval for additional billable requests.
 - **Grounding is probabilistic:** valid excerpt IDs and citation metadata cannot prove that every claim follows from the text. A model can cite real pages while misinterpreting them. Review cited originals, particularly safety procedures. Prompt injection defenses are instructions and validation, not a guarantee of semantic correctness.
 - **Text-only extraction:** tables may flatten; control icons may disappear; a diagram may carry essential orientation information. No OCR, image understanding, or diagram reconstruction is provided. The model is instructed to call out these dependencies and link the original manual. Multilingual diagram-only pages are accessible but not embedded.
 - **Context completeness:** top-k search and neighboring/safety pages improve coverage but cannot guarantee every distant prerequisite or warning is retrieved. Long individual sentences can be split; chunks preserve page context, not a full semantic document structure.
@@ -175,6 +183,8 @@ The provided manuals are Bosch/BSH manufacturer documents; HomeGuide does not cl
 - [WAV28EH3GB — Bosch-WAV28EH3GB-Washing-Machine.pdf](https://media3.bosch-home.com/Documents/9001599859_B.pdf)
 - [SMS8ZDI86M — Bosch-SMS8ZDI86M-Dishwasher.pdf](https://media3.bosch-home.com/Documents/9001722657_D.pdf)
 - [TIS 3.3. family — Bosch-TIS-3.3-Coffee-Machine.pdf](https://media3.bosch-home.com/Documents/8001036206_B.pdf)
+- [HBG936C.1 family — Bosch-HBG936C.1-Oven.pdf](https://media3.bosch-home.com/Documents/9002004401_B.pdf)
+- [BFL524MB2 — Bosch-BFL524MB2-Microwave.pdf](https://media3.bosch-home.com/Documents/9001974035_E.pdf)
 
 Downloads being publicly accessible does **not** establish redistribution permission. PDFs, extracted text, caches, embeddings and indexes are ignored by Git. Keep the originals local; see [pdfs/README.md](pdfs/README.md). To add another manual, obtain permission/authorized access, inspect it, and add a manifest entry with its model, language, physical page ranges, safety pages and verified questions.
 

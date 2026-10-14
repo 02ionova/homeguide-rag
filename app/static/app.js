@@ -4,7 +4,9 @@ const $ = id => document.getElementById(id);
 const icons = {
   'washing-machine': '<svg viewBox="0 0 36 42" aria-hidden="true"><rect x="5" y="3" width="26" height="35" rx="3"/><path d="M5 11h26M10 7h5M25 7h1"/><circle cx="18" cy="24" r="9"/><path d="M10 25c5-6 10 6 16-1M9 38v2m18-2v2"/></svg>',
   dishwasher: '<svg viewBox="0 0 36 42" aria-hidden="true"><rect x="5" y="3" width="26" height="35" rx="3"/><path d="M5 12h26M10 7h5m10 0h1M11 20h14M11 25h14M11 30h14M9 38v2m18-2v2"/></svg>',
-  'coffee-machine': '<svg viewBox="0 0 36 42" aria-hidden="true"><path d="M6 37V6a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v31ZM6 13h22M11 8h4m8 0h1M16 13v7m4-7v7M9 34h16"/><path d="M12 24h10v5a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4Zm10 1h2a2 2 0 0 1 0 4h-2"/></svg>'
+  'coffee-machine': '<svg viewBox="0 0 36 42" aria-hidden="true"><path d="M6 37V6a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v31ZM6 13h22M11 8h4m8 0h1M16 13v7m4-7v7M9 34h16"/><path d="M12 24h10v5a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4Zm10 1h2a2 2 0 0 1 0 4h-2"/></svg>',
+  oven: '<svg viewBox="0 0 36 42" aria-hidden="true"><rect x="4" y="3" width="28" height="35" rx="3"/><path d="M4 12h28M10 16h16M9 38v2m18-2v2"/><circle cx="11" cy="8" r="1.5"/><circle cx="25" cy="8" r="1.5"/><rect x="9" y="20" width="18" height="12" rx="2"/><path d="M13 29v-2m5 2v-4m5 4v-2"/></svg>',
+  microwave: '<svg viewBox="0 0 36 42" aria-hidden="true"><rect x="2" y="8" width="32" height="26" rx="3"/><rect x="6" y="12" width="19" height="17" rx="2"/><path d="M29 14v8M7 34v3m22-3v3M10 20c3-4 5 4 9 0M10 24c3-4 5 4 9 0"/><circle cx="29" cy="27" r="1"/></svg>'
 };
 let docs = [], selected = null, busy = false;
 const input = $('question');
@@ -87,6 +89,7 @@ function selectAppliance(doc, focusComposer = true) {
 function renderDocuments() {
   $('appliance-list').replaceChildren(); $('document-list').replaceChildren();
   $('appliance-count').textContent = String(docs.length).padStart(2, '0');
+  $('library-summary').textContent = `${docs.length} manuals. One helpful place.`;
   docs.forEach(doc => {
     const button = element('button', 'appliance-button');
     button.type = 'button'; button.dataset.id = doc.id;

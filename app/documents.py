@@ -46,10 +46,12 @@ def documents(settings: Settings) -> list[Document]:
 
 
 def document_for(appliance: str | None, settings: Settings) -> Document:
-    for d in documents(settings):
+    registered = documents(settings)
+    for d in registered:
         if d.id == appliance:
             return d
-    raise HomeGuideError('Please select washing-machine, dishwasher, or coffee-machine to clarify the appliance.')
+    choices = ', '.join(d.id for d in registered)
+    raise HomeGuideError(f'Please select an appliance from: {choices}.')
 
 
 def pdf_path(doc: Document, settings: Settings) -> Path:

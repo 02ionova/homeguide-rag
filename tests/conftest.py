@@ -13,7 +13,7 @@ def corpus(tmp_path, monkeypatch):
     pdf_dir = tmp_path / 'pdfs'
     pdf_dir.mkdir()
     manifest = []
-    for id_, subject in [('washing-machine', 'child lock'), ('dishwasher', 'filter cleaning'), ('coffee-machine', 'coffee flow')]:
+    for id_, subject in [('washing-machine', 'child lock'), ('dishwasher', 'filter cleaning'), ('coffee-machine', 'coffee flow'), ('oven', 'oven cleaning'), ('microwave', 'microwave cookware')]:
         filename = id_ + '.pdf'
         with pymupdf.open() as pdf:
             for page in range(3):

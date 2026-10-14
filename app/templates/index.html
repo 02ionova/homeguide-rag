@@ -8,7 +8,7 @@
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/static/fonts/Manrope-Variable.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/static/styles.css?v=2">
-  <script src="/static/app.js" defer></script>
+  <script src="/static/app.js?v=3" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#question">Skip to message composer</a>
@@ -20,14 +20,14 @@
     </a>
     <p class="sidebar-tagline">A little help for your home.</p>
     <button id="new-chat" class="new-chat"><span aria-hidden="true">＋</span> New chat <span class="shortcut" aria-hidden="true">↗</span></button>
-    <div class="section-label">YOUR APPLIANCES <span id="appliance-count">03</span></div>
+    <div class="section-label">YOUR APPLIANCES <span id="appliance-count">—</span></div>
     <nav id="appliance-list" class="appliance-list" aria-label="Select an appliance"><p class="sidebar-muted">Loading appliances…</p></nav>
     <section class="manual-section" aria-labelledby="manual-heading">
       <div class="section-label" id="manual-heading">MANUAL LIBRARY <span aria-hidden="true">↗</span></div>
       <div id="document-list" class="document-list"></div>
       <p class="library-note">Original manuals. Answers you can trace.</p>
     </section>
-    <div class="sidebar-bottom"><span class="small-home" aria-hidden="true">⌂</span><div>Your home, understood.<small>Three manuals. One helpful place.</small></div></div>
+    <div class="sidebar-bottom"><span class="small-home" aria-hidden="true">⌂</span><div>Your home, understood.<small id="library-summary">Manuals for your everyday.</small></div></div>
   </aside>
   <main class="main">
     <header class="topbar">
