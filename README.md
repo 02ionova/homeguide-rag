@@ -178,6 +178,10 @@ The provided manuals are Bosch/BSH manufacturer documents; HomeGuide does not cl
 
 Downloads being publicly accessible does **not** establish redistribution permission. PDFs, extracted text, caches, embeddings and indexes are ignored by Git. Keep the originals local; see [pdfs/README.md](pdfs/README.md). To add another manual, obtain permission/authorized access, inspect it, and add a manifest entry with its model, language, physical page ranges, safety pages and verified questions.
 
+## Interface assets
+
+The interface uses a navy sidebar, indigo accents, pale lavender surfaces and a responsive Manrope typeface. The variable font is served locally from `app/static/fonts/`, with no external font requests during browser use. Manrope is Copyright 2018 The Manrope Project Authors and is distributed under the [SIL Open Font License 1.1](app/static/fonts/OFL-Manrope.txt); the bundled font and license come from the [Google Fonts Manrope source](https://github.com/google/fonts/tree/main/ofl/manrope).
+
 ## GitHub repository
 
 Private repository: [02ionova/homeguide-rag](https://github.com/02ionova/homeguide-rag). Sign in to the authorized GitHub account to view it.
