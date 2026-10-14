@@ -1,5 +1,7 @@
 from dataclasses import replace
-from pathlib import Path
+import pymupdf
+
+from app.ingestion import ingest
 
 from fastapi.testclient import TestClient
 
@@ -24,7 +26,13 @@ def test_startup_and_missing_index(tmp_path):
 
 
 def test_clarification_validation_and_registered_routes(tmp_path):
-    with TestClient(create_app(replace(Settings(), chroma_dir=tmp_path))) as client:
+    pdf_dir = tmp_path / 'pdfs'
+    pdf_dir.mkdir()
+    for filename in ('9001599859_B.pdf', '9001722657_D.pdf', '8001036206_B.pdf'):
+        with pymupdf.open() as pdf:
+            pdf.new_page()
+            pdf.save(pdf_dir / filename)
+    with TestClient(create_app(replace(Settings(), chroma_dir=tmp_path, pdf_dir=pdf_dir))) as client:
         response = client.post('/api/chat', json={'question': 'How do I clean it?'})
         assert response.json()['status'] == 'clarification'
         assert 'Which appliance' in response.json()['answer']
@@ -43,8 +51,9 @@ def test_clarification_validation_and_registered_routes(tmp_path):
             assert 'inline' in response.headers['content-disposition']
 
 
-def test_missing_credentials_existing_index():
-    settings = replace(Settings(), llm_api_key='')
+def test_missing_credentials_existing_index(corpus):
+    settings = corpus
+    ingest(settings)
     with TestClient(create_app(settings)) as client:
         response = client.post('/api/chat', json={'appliance': 'washing-machine', 'question': 'Child lock?'})
         assert response.status_code == 503

@@ -134,7 +134,7 @@ function addMessage(role, text, sources = [], status = '') {
   renderCitations(body, text, sources);
   if (sources.length) {
     const details = element('details', 'sources');
-    details.append(element('summary', '', `Sources · ${sources.length} pages reviewed`));
+    details.append(element('summary', '', `Sources · ${sources.length} ${sources.length === 1 ? 'page' : 'pages'} reviewed`));
     sources.forEach(source => {
       const card = element('div', 'source-card');
       const link = element('a', '', `${source.filename}, p. ${source.page}`);

@@ -109,3 +109,37 @@ def test_timeout_is_actionable(source):
         raise httpx.ReadTimeout('private details', request=request)
     with pytest.raises(HomeGuideError, match='within the timeout'):
         generate('Question', document_for('washing-machine', settings), [source], settings, httpx.MockTransport(handler))
+
+
+def test_transient_retry_then_success(source, monkeypatch):
+    settings = replace(Settings(), llm_api_key='test-placeholder', retries=1)
+    monkeypatch.setattr('app.generation.time.sleep', lambda _: None)
+    calls = []
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(503) if len(calls) == 1 else response(draft(source))
+    result = generate('Child lock?', document_for('washing-machine', settings), [source], settings, httpx.MockTransport(handler))
+    assert result.status == 'answered'
+    assert len(calls) == 2
+
+
+def test_citation_regeneration_can_recover(source):
+    settings = replace(Settings(), llm_api_key='test-placeholder', retries=0)
+    calls = []
+    def handler(request):
+        calls.append(request)
+        raw = draft(source)
+        if len(calls) == 1:
+            raw['answer'] = raw['answer'].replace('p. 34', 'p. 999')
+        else:
+            assert 'failed citation/evidence validation' in json.loads(request.content)['input']
+        return response(raw)
+    assert generate('Child lock?', document_for('washing-machine', settings), [source], settings, httpx.MockTransport(handler)).status == 'answered'
+    assert len(calls) == 2
+
+
+def test_whitespace_is_not_supporting_evidence(source):
+    raw = draft(source)
+    raw['evidence'][0]['quote'] = ' ' * 20
+    with pytest.raises(InvalidAnswer, match='quoted evidence'):
+        validate_answer(raw, [source])

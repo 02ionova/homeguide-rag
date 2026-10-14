@@ -83,7 +83,8 @@ def validate_answer(raw: dict, sources: list[Source]) -> str:
     evidence_pages = set()
     for evidence in draft.evidence:
         key = (evidence.filename, evidence.page)
-        if key not in allowed or normalized(evidence.quote) not in normalized(allowed[key]):
+        quote = normalized(evidence.quote)
+        if key not in allowed or len(quote) < 12 or quote not in normalized(allowed[key]):
             raise InvalidAnswer('The quoted evidence is not in the source page.')
         evidence_pages.add(key)
     if not cited <= evidence_pages:
