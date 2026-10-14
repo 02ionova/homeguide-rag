@@ -24,6 +24,8 @@ def retrieve(question: str, appliance: str, settings: Settings, collection=None)
             for adjacent in (p - 1, p + 1):
                 if adjacent in doc.pages:
                     kinds.setdefault(adjacent, 'adjacent procedure context')
+            for related in doc.related_pages.get(str(p), []):
+                kinds.setdefault(related, 'related procedure context')
         for p in doc.safety_pages:
             kinds.setdefault(p, 'safety context')
         rows = collection.get(where={'$and': [{'appliance': doc.id}, {'page': {'$in': list(kinds)}}]},

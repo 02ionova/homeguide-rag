@@ -19,13 +19,12 @@ def test_cli_and_web_complete_pipeline_with_mocked_provider(corpus, monkeypatch,
         payload = json.loads(request.content)
         user_data = json.loads(payload['input'])
         if 'weather' in user_data['question'].lower():
-            raw = {'supported': False, 'answer': UNKNOWN, 'evidence': []}
+            raw = {'supported': False, 'blocks': []}
         else:
             source = user_data['untrusted_reference_data'][0]
-            quote = source['text'][:120]
             raw = {'supported': True,
-                   'answer': 'This manual discusses child lock instructions. [' + source['filename'] + ', p. ' + str(source['page']) + ']',
-                   'evidence': [{'filename': source['filename'], 'page': source['page'], 'quote': quote}]}
+                   'blocks': [{'text': 'This manual discusses child lock instructions.',
+                               'evidence': [{'source_id': source['source_id']}]}]}
         return httpx.Response(200, json={'status': 'completed', 'output': [
             {'type': 'message', 'content': [{'type': 'output_text', 'text': json.dumps(raw)}]}]})
     # Only generation's client factory is replaced; no live socket or API is used.

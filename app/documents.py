@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from app.config import Settings, HomeGuideError
@@ -20,6 +20,7 @@ class Document:
     language: str
     notes: str
     questions: list[dict]
+    related_pages: dict[str, list[int]] = field(default_factory=dict)
 
     @property
     def pages(self):
@@ -36,6 +37,9 @@ def documents(settings: Settings) -> list[Document]:
                 raise ValueError('Invalid PDF filename')
             if not d.pages or min(d.pages) < 1 or max(d.pages) > d.page_count:
                 raise ValueError('Invalid physical page range')
+            if any(int(page) not in d.pages or any(p not in d.pages for p in related)
+                   for page, related in d.related_pages.items()):
+                raise ValueError('Related procedure pages must belong to the same indexed manual')
         return result
     except (OSError, ValueError, TypeError, KeyError) as exc:
         raise HomeGuideError('The document manifest is missing or invalid. Check documents.json.') from exc

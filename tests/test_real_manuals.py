@@ -46,3 +46,17 @@ def test_absent_question_retrieval_is_not_an_answerability_gate():
     # A vector DB always returns neighbors; these results are not proof of an answer.
     assert sources
     assert not any('weather forecast' in s.text.lower() for s in sources)
+
+
+@pytest.mark.parametrize('appliance,question,expected_pages', [
+    ('washing-machine', 'How can I turn on kids lock?', [34]),
+    ('washing-machine', 'clean drum', [40]),
+    ('dishwasher', 'filter is dirty how clean it', [40, 41]),
+    ('coffee-machine', 'run cleaning cycle', [21, 22]),
+    ('coffee-machine', 'coffee comes out too slowly', [15, 23]),
+    ('coffee-machine', 'cofee drips very slow', [15, 23]),
+])
+def test_informal_and_misspelled_questions(appliance, question, expected_pages):
+    sources = retrieve(question, appliance, Settings())
+    assert set(expected_pages) <= {source.page for source in sources}
+    assert all(source.appliance == appliance for source in sources)

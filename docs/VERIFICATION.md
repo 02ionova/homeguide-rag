@@ -55,3 +55,15 @@ Renamed all three local source PDFs to descriptive Bosch appliance/model filenam
 ## Authenticated GitHub publication
 
 After the user completed GitHub CLI browser authentication for `02ionova`, created the private repository https://github.com/02ionova/homeguide-rag and connected the existing local repository as origin. Preserved all local milestone commits and used a normal push. Scanned every historical committed file version for credential patterns and the configured local API key before publishing; `.env`, PDFs and generated data remain excluded. No tests were repeated for this documentation-only publication update; the code and previously verified index are unchanged.
+
+## Suggested-question failure and flexible wording update
+
+Reproduced the reported failure using the configured OpenAI gpt-4.1-mini API: the suggested child-lock question retrieved physical p. 34, but the model omitted inline citations. The old validation rejected a retrieved answer as a formatting error. A copied-quote approach also proved sensitive to model quotation formatting.
+
+Generation now returns answer blocks with references to app-created, contiguous source excerpts (100 words, 30-word overlap). The app validates every excerpt ID and renders canonical filename/page citations itself. It no longer asks the model to type filenames or reproduce evidence quotation punctuation. Missing/unknown references, empty evidence, invented inline pages and guessed lock/padlock/key icons against explicitly blank display extraction are rejected. One regeneration includes the specific validation reason; an output-limit truncation gets one larger output budget. Natural-language instructions accept short/informal wording and minor spelling mistakes while preserving the insufficient-evidence fallback.
+
+An actual live child-lock query succeeded with a p. 34 citation; its activation timing, locked controls and persistence after switch-off were manually compared with the source. The broader nine-question live test batch was blocked by automatic approval review because it requires explicit approval for additional billable requests and manual-excerpt transmission. Approval was requested; no batch requests were sent.
+
+Local retrieval checks revealed that informal slow-coffee questions missed the separate grinder safety page. Added reviewed same-manual context links: coffee p. 23 → pp. 15, 21–22; p. 22 → pp. 20–21. Rebuilt the real index; all 346 chunks and original PDF hashes are preserved. No hardcoded answers or sample-question matching was added.
+
+Validation after the final changes: **36 fast automated checks passed**, **9 real-manual integration checks passed** (including six informal/typo queries), Python compilation passed, and the browser interaction/layout checks passed against the restarted server. Browser responses were mocked and did not use the API key. The live model was tested on the child-lock example only; claim support on other generated answers remains unmeasured.

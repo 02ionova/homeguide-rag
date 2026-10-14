@@ -1,6 +1,6 @@
 # Manual-support evaluation
 
-Evaluation used original local PDFs, PyMuPDF extracted text and real MiniLM retrieval. This is a review of grounded example content and retrieval support, **not** live model-output evaluation. No LLM API key was available. Mocked HTTP output verifies code paths but cannot measure a model's factual reliability.
+The initial evaluation used original local PDFs, PyMuPDF extracted text and real MiniLM retrieval. The table reviews grounded example content and retrieval support. A subsequent live child-lock evaluation is recorded below; the other generated answers have not yet had live evaluation. Mocked HTTP output verifies code paths but cannot measure a model's factual reliability.
 
 | Question / reviewed answer content | Manual evidence (physical pages) | Evaluation and required conditions |
 |---|---|---|
@@ -14,4 +14,12 @@ Evaluation used original local PDFs, PyMuPDF extracted text and real MiniLM retr
 
 All six manifest questions retrieved their expected pages in the built index, filtered to the selected manual. The coffee cleaning query retrieves pp. 21–22 through neighboring page expansion as well as semantic matches, demonstrating why preserving adjacent procedure context matters.
 
-Before submission with a configured key, run all six questions plus absent/mixed questions, compare every generated step and warning with the above pages, and record omissions or unsupported claims. Test prompt-injection text separately. Quote/citation validators only establish source membership; they do not prove entailment or robust injection resistance.
+Before submission with a configured key, run all six questions plus absent/mixed questions, compare every generated step and warning with the above pages, and record omissions or unsupported claims. Test prompt-injection text separately. Excerpt-ID/citation validators only establish source membership; they do not prove entailment or robust injection resistance.
+
+## Live failure reproduction and citation fix
+
+A real OpenAI gpt-4.1-mini response to the suggested child-lock question retrieved p. 34 correctly but omitted inline citations, so the old formatter rejected it and asked the user to rephrase. Requiring copied evidence quotes also made punctuation/layout differences into response failures. The final implementation instead supplies application-owned excerpt IDs, requires evidence references on each answer block, and renders filename/page citations deterministically from validated metadata. There is no fuzzy acceptance of invented quotes: quoted text is no longer generated for verification; the app retains the exact referenced excerpt.
+
+The revised child-lock query completed live with a p. 34 citation. Manual comparison confirmed holding both labelled buttons for approximately three seconds, locked controls, and persistence after switch-off. An earlier diagnostic guessed a lock symbol missing from extraction; the prompt and validator now explicitly reject naming lock/padlock/key symbols against a blank extracted display label. The final live answer did not name the missing icon.
+
+Six informal/typo retrieval variants were checked locally. The coffee variants exposed missing grinder safety context, so the manifest now links the p. 23 fault table to p. 15 and pp. 21–22, and p. 22 cleaning to pp. 20–21. These are reviewed document relationships, not hardcoded question/answer pairs. Broader live checks remain pending approval for their additional API usage.

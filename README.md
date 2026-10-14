@@ -14,7 +14,7 @@ The original files in the workspace were inspected before implementation. All pa
 
 The washing and dishwasher manuals are English. The coffee manual also contains French, Dutch, Polish, Czech, Russian and German; only English and the shared cover are embedded. Shared coffee diagram pages 2–4 remain available in the original PDF but contain no meaningful extractable text. Blank/manufacturer backmatter pages outside the selected ranges are excluded. No OCR was needed. The coffee cover identifies a family, not a more precise model; the app does not assume one.
 
-`documents.json` records page ranges, safety pages, model names, original SHA-256 hashes and example questions. It is the allowlist for ingestion and PDF serving. Original PDFs are never modified.
+`documents.json` records page ranges, safety pages, related procedure pages, model names, original SHA-256 hashes and example questions. It is the allowlist for ingestion and PDF serving. Original PDFs are never modified.
 
 ## Setup on Mac / PyCharm
 
@@ -88,7 +88,7 @@ In PyCharm, select **Settings → Project → Python Interpreter → Add Local I
 
 ## Verified example questions and citations
 
-These questions were checked against actual extracted text and real semantic retrieval. **Live LLM answers were not verified because no local API key was available.** Expected citations list the supporting physical pages; a complete answer may also cite relevant supplied safety pages.
+These questions were checked against actual extracted text and real semantic retrieval. The child-lock question was also verified with a live OpenAI answer after fixing citation formatting. Broader live answer evaluation is pending explicit approval for the additional API calls; local retrieval checks cover all six suggested questions plus informal and misspelled variants. Expected citations list the supporting physical pages; a complete answer may also cite relevant supplied safety pages.
 
 | Question | Expected supporting citations | Support checked |
 |---|---|---|
@@ -124,18 +124,18 @@ Registered PDFs → PyMuPDF text per physical page → conservative cleanup
 → persistent Chroma (cosine search; filename/page/appliance/model/chunk ID)
 
 Selected appliance + question → same MiniLM embedder → top-k filtered chunks
-→ complete matching pages + adjacent pages + selected manual safety pages
-→ labelled untrusted reference data + question → OpenAI Responses API
-→ citation allowlist + exact evidence quote checks → web/CLI answer and sources
+→ complete matching pages + adjacent/related procedure pages + safety pages
+→ short excerpts with stable IDs + question → OpenAI Responses API
+→ validated excerpt references → application-rendered citations → answer and sources
 ```
 
 Cleanup removes standalone page numbers/`en`, soft hyphens and line-wrapped word breaks, while retaining useful headings, warnings, units and conditions. Repeated headers are conservatively retained instead of risking deletion of procedure context. Chunks stay on one physical page. Chunk IDs are deterministic SHA-256 values of filename, page, ordinal and text.
 
 A content fingerprint covers actual PDF hashes, manifest, model and chunk settings. Matching ingestion runs reuse the existing index without duplication. Changed manuals, manifest or embedding model trigger a new generation. An ingestion lock prevents concurrent writers. The active pointer is replaced only after every document is validated and embedded; a failed rebuild leaves the old index intact. Old generations are retained for in-flight readers and may consume disk space. To reclaim space, stop the server and delete the configured **generated** Chroma directory, then ingest again; preserve `pdfs/`.
 
-Retrieval filters by appliance before vector search. Matching pages are reconstructed from overlapping chunks in order, supplemented with neighboring indexed pages to preserve procedure continuations, plus registered safety pages. There is no arbitrary similarity cutoff for answerability. Missing or stale indexes fail with an ingestion command instead of silently using mismatched embeddings.
+Retrieval filters by appliance before vector search. Matching pages are reconstructed from overlapping chunks in order, supplemented with neighboring indexed pages, registered safety pages and manually verified related procedure links. For example, the coffee troubleshooting table on p. 23 brings in p. 15 for grinder-adjustment safety and pp. 21–22 for cleaning/descaling, even when the question uses informal wording. There is no arbitrary similarity cutoff for answerability. Missing or stale indexes fail with an ingestion command instead of silently using mismatched embeddings.
 
-The LLM is instructed to treat PDF text as reference data, retain conditions/warnings, state possible causes cautiously, acknowledge missing diagrams/icons, and decline unsupported questions. Structured output contains an answerability flag and exact evidence quotes. Code verifies the `[filename, p. N]` syntax, page allowlist, citations on each paragraph/numbered step, and quote presence on every cited page. Invalid output is regenerated once, then rejected with a useful error. Transport failures use bounded retries with short backoff; provider response bodies and secret values are never displayed. Unknown appliances require clarification; source PDFs can only be accessed by registered ID.
+The LLM is instructed to understand ordinary phrasing, short questions and minor spelling mistakes while treating PDF text as reference data. It must retain conditions/warnings, state possible causes cautiously, acknowledge missing diagrams/icons and decline unsupported questions. Each retrieved page is divided into 100-word excerpts with 30-word overlap, assigned request-local IDs, and passed to the model. Structured output contains an answerability flag and answer blocks referencing those IDs. The application verifies every reference and builds `[filename, p. N]` citations itself from the original metadata for each block. The model does not need to type long filenames or reproduce quotation formatting. Unknown excerpt IDs, invented inline citation pages and uncited blocks are rejected. An explicit missing display-symbol check catches guessed lock/padlock/key icons where extraction left a blank display label. Invalid output gets one regeneration with the specific validation reason; output truncated by the token limit gets a larger budget on that one retry. Transport failures use bounded retries with short backoff; provider bodies and secret values are never displayed. Unknown appliances require clarification; source PDFs can only be accessed by registered ID.
 
 ## Checks
 
@@ -160,8 +160,8 @@ Default pytest discovers only `tests/`, preserving the unrelated root exercise. 
 
 ## Limitations
 
-- **No live LLM verification:** no local API key was configured. Real PDF ingestion, embeddings, storage, semantic retrieval, web/CLI error handling, mocked generation and browser interaction were verified. Add a key and evaluate generated answers before relying on them.
-- **Grounding is probabilistic:** valid metadata and verbatim quotes cannot prove that every claim follows from the text. A model can cite real pages while misinterpreting them. Review cited originals, particularly safety procedures. Prompt injection defenses are instructions and validation, not a guarantee of semantic correctness.
+- **Limited live LLM evaluation:** a live child-lock answer was verified after the citation fix. The six suggested questions, six informal/typo retrieval variants, generation error paths and browser interactions have local/mocked checks. Broader live model-output evaluation awaits approval for additional billable requests.
+- **Grounding is probabilistic:** valid excerpt IDs and citation metadata cannot prove that every claim follows from the text. A model can cite real pages while misinterpreting them. Review cited originals, particularly safety procedures. Prompt injection defenses are instructions and validation, not a guarantee of semantic correctness.
 - **Text-only extraction:** tables may flatten; control icons may disappear; a diagram may carry essential orientation information. No OCR, image understanding, or diagram reconstruction is provided. The model is instructed to call out these dependencies and link the original manual. Multilingual diagram-only pages are accessible but not embedded.
 - **Context completeness:** top-k search and neighboring/safety pages improve coverage but cannot guarantee every distant prerequisite or warning is retrieved. Long individual sentences can be split; chunks preserve page context, not a full semantic document structure.
 - **Scope:** only registered models/manuals, English output, no accounts, repair diagnosis, web search, conversational memory or deployment. Chats live in browser memory and reset on reload. Run locally on loopback; this is not a public multi-user service.
