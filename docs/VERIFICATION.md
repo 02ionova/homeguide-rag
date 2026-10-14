@@ -47,3 +47,7 @@ Five milestone commits are saved locally. Every commit was preceded by staged-fi
 GitHub profile lookup succeeded for `02ionova`, but no local GitHub token/helper credential or `gh` executable was available. The connected GitHub tool set offered no repository-creation operation. Therefore no private repository URL exists and no push was performed. The exact terminal authentication and private-repository creation commands are in the README.
 
 Live generation and redistribution-authorized sample PDF inclusion remain unverified/unresolved respectively. These are the external steps needed before asserting all university completion criteria are met.
+
+## Readable filename update
+
+Renamed all three local source PDFs to descriptive Bosch appliance/model filenames; contents and recorded hashes are unchanged. Updated manifest, citations, documentation and fixtures; official download URLs retain original manufacturer document numbers. Rebuilt the index with 346 chunks and verified the new metadata. The library displays shorter appliance-manual labels. Browser checks now mock all chat requests, including setup errors, so configured local credentials are never used by browser automation. The 31 fast checks, 3 real-manual integration checks and browser checks were repeated for this update.

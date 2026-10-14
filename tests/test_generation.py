@@ -12,20 +12,20 @@ from app.schemas import Source
 
 @pytest.fixture
 def source():
-    return Source(filename='9001599859_B.pdf', page=34, appliance='washing-machine',
+    return Source(filename='Bosch-WAV28EH3GB-Washing-Machine.pdf', page=34, appliance='washing-machine',
                   model='Bosch WAV28EH3GB', text='Press and hold the two Child Lock push 3 sec. buttons for approx. 3 seconds. The childproof lock remains active even after the appliance has been switched off.',
                   url='/manuals/washing-machine#page=34')
 
 
 def draft(source):
     return {'supported': True,
-            'answer': 'Press and hold the two Child Lock push 3 sec. buttons for about 3 seconds. [9001599859_B.pdf, p. 34]',
+            'answer': 'Press and hold the two Child Lock push 3 sec. buttons for about 3 seconds. [Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]',
             'evidence': [{'filename': source.filename, 'page': source.page,
                           'quote': 'Press and hold the two Child Lock push 3 sec. buttons for approx. 3 seconds.'}]}
 
 
 def test_valid_citation_and_exact_evidence(source):
-    assert validate_answer(draft(source), [source]).endswith('[9001599859_B.pdf, p. 34]')
+    assert validate_answer(draft(source), [source]).endswith('[Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]')
 
 
 @pytest.mark.parametrize('mutation', ['wrong_page', 'wrong_file', 'fake_quote', 'uncited', 'link', 'missing_quote', 'uncited_step'])

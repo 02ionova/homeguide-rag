@@ -1,6 +1,6 @@
 # HomeGuide
 
-A calm, English-language chat application for owners of three Bosch household appliances. Ask about operation, maintenance or troubleshooting; HomeGuide retrieves the selected manual's pages and asks an LLM to answer with clickable citations such as `[9001599859_B.pdf, p. 34]`. Both a FastAPI web interface and a Python CLI are included. No frontend build tools are needed.
+A calm, English-language chat application for owners of three Bosch household appliances. Ask about operation, maintenance or troubleshooting; HomeGuide retrieves the selected manual's pages and asks an LLM to answer with clickable citations such as `[Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]`. Both a FastAPI web interface and a Python CLI are included. No frontend build tools are needed.
 
 ## Supported documents
 
@@ -8,9 +8,9 @@ The original files in the workspace were inspected before implementation. All pa
 
 | Appliance | Supported model/family from the actual PDF | Filename | Total pages | Indexed physical pages | Chunks |
 |---|---|---|---:|---|---:|
-| Washing machine | Bosch WAV28EH3GB | `9001599859_B.pdf` | 60 | 1–57, 60 | 137 |
-| Dishwasher | Bosch SMS8ZDI86M | `9001722657_D.pdf` | 56 | 1–52, 56 | 140 |
-| Coffee machine | Bosch TIS 3.3. family | `8001036206_B.pdf` | 176 | 1, 5–26 | 69 |
+| Washing machine | Bosch WAV28EH3GB | `Bosch-WAV28EH3GB-Washing-Machine.pdf` | 60 | 1–57, 60 | 137 |
+| Dishwasher | Bosch SMS8ZDI86M | `Bosch-SMS8ZDI86M-Dishwasher.pdf` | 56 | 1–52, 56 | 140 |
+| Coffee machine | Bosch TIS 3.3. family | `Bosch-TIS-3.3-Coffee-Machine.pdf` | 176 | 1, 5–26 | 69 |
 
 The washing and dishwasher manuals are English. The coffee manual also contains French, Dutch, Polish, Czech, Russian and German; only English and the shared cover are embedded. Shared coffee diagram pages 2–4 remain available in the original PDF but contain no meaningful extractable text. Blank/manufacturer backmatter pages outside the selected ranges are excluded. No OCR was needed. The coffee cover identifies a family, not a more precise model; the app does not assume one.
 
@@ -54,7 +54,7 @@ Restart the server after changing configuration. The default MiniLM model produc
 
 ## Ingest, ask and run
 
-The three supplied manuals already exist locally. On a fresh checkout, obtain them from the official links below and put the exact filenames in `pdfs/` before ingestion.
+The three supplied manuals already exist locally. On a fresh checkout, obtain them from the official links below and save them in `pdfs/` under the readable filenames in the supported-documents table. Bosch's original download filenames differ; the PDF contents must remain unchanged.
 
 ```bash
 # Ingest all registered PDFs from pdfs/; repeat runs are idempotent.
@@ -92,12 +92,12 @@ These questions were checked against actual extracted text and real semantic ret
 
 | Question | Expected supporting citations | Support checked |
 |---|---|---|
-| How do I activate the washing machine’s child lock? | `[9001599859_B.pdf, p. 34]` | Hold the two labelled Child Lock buttons for approximately 3 seconds; lock persists after switch-off |
-| How should I clean the washing machine drum? | `[9001599859_B.pdf, p. 40]` | Drum clean without laundry, all-purpose washing powder; ventilation/temperature conditions |
-| How do I clean the dishwasher filter? | `[9001722657_D.pdf, p. 40]`, `[9001722657_D.pdf, p. 41]` | Check residue, remove/disassemble, rinse, reassemble and align; original diagrams required for orientation |
-| How often should I run Machine Care? | `[9001722657_D.pdf, p. 39]` | On reminder; every 2 months for appliances without a reminder, without tableware |
-| How do I start the coffee machine’s cleaning programme? | `[8001036206_B.pdf, p. 21]`, `[8001036206_B.pdf, p. 22]` | Calc’nClean start and complete procedure, approximately 40 minutes, cleaning/descaling precautions |
-| What should I check if coffee flows slowly? | `[8001036206_B.pdf, p. 23]`, `[8001036206_B.pdf, p. 15]` | Possible fine grind, limescale or air in filter; grinding adjustment only while grinder runs; never reach into grinder |
+| How do I activate the washing machine’s child lock? | `[Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]` | Hold the two labelled Child Lock buttons for approximately 3 seconds; lock persists after switch-off |
+| How should I clean the washing machine drum? | `[Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 40]` | Drum clean without laundry, all-purpose washing powder; ventilation/temperature conditions |
+| How do I clean the dishwasher filter? | `[Bosch-SMS8ZDI86M-Dishwasher.pdf, p. 40]`, `[Bosch-SMS8ZDI86M-Dishwasher.pdf, p. 41]` | Check residue, remove/disassemble, rinse, reassemble and align; original diagrams required for orientation |
+| How often should I run Machine Care? | `[Bosch-SMS8ZDI86M-Dishwasher.pdf, p. 39]` | On reminder; every 2 months for appliances without a reminder, without tableware |
+| How do I start the coffee machine’s cleaning programme? | `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 21]`, `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 22]` | Calc’nClean start and complete procedure, approximately 40 minutes, cleaning/descaling precautions |
+| What should I check if coffee flows slowly? | `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 23]`, `[Bosch-TIS-3.3-Coffee-Machine.pdf, p. 15]` | Possible fine grind, limescale or air in filter; grinding adjustment only while grinder runs; never reach into grinder |
 
 A question absent from all three manuals is **“What is tomorrow’s weather in Prague?”** Expected answer:
 
@@ -111,7 +111,7 @@ The fallback is enforced when the model reports insufficient evidence. Automated
 $ python -m scripts.query --appliance washing-machine "How do I activate the washing machine’s child lock?"
 Press and hold the two buttons labelled “Child Lock push 3 sec.” for approximately
 3 seconds. The controls lock, and the childproof lock remains active even after
-the machine is switched off. [9001599859_B.pdf, p. 34]
+the machine is switched off. [Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]
 ```
 
 **Actual local ingestion result:** 346 chunks (137 washing machine, 140 dishwasher, 69 coffee machine) across 134 text-bearing pages. Repeating ingestion returned `status: unchanged`, the same collection, and the same chunk count. See [manual-support evaluation](docs/ANSWER_EVALUATION.md) and [verification record](docs/VERIFICATION.md) for the practical limits of these checks.
@@ -147,7 +147,7 @@ python -m pytest -q
 # Actual supplied manuals + real MiniLM + persisted Chroma. Ingest first.
 HF_HUB_OFFLINE=1 python -m pytest -m integration -q
 
-# Browser checks against the running server (expects no configured API key).
+# Browser checks against the running server (all chat requests are mocked).
 python -m playwright install chromium
 python -m scripts.verify_browser
 
@@ -156,7 +156,7 @@ python -m pip check
 python -m scripts.check_staged
 ```
 
-Default pytest discovers only `tests/`, preserving the unrelated root exercise. Integration tests are explicitly opt-in. Browser checks use mocked success responses, and the real backend missing-key path; screenshots are saved in ignored `data/screenshots/`. Browser automation covers desktop/mobile widths, message keyboard handling, loading, duplicate submissions, citations/source excerpts, unsafe HTML displayed as text, reset behavior, exact fallback and connection errors.
+Default pytest discovers only `tests/`, preserving the unrelated root exercise. Integration tests are explicitly opt-in. Browser checks mock all chat requests, including the missing-key response, so they work safely with a configured API key and never make paid LLM requests; screenshots are saved in ignored `data/screenshots/`. Backend tests separately exercise the real missing-key path. Browser automation covers desktop/mobile widths, message keyboard handling, loading, duplicate submissions, citations/source excerpts, unsafe HTML displayed as text, reset behavior, exact fallback and connection errors.
 
 ## Limitations
 
@@ -172,9 +172,9 @@ Default pytest discovers only `tests/`, preserving the unrelated root exercise. 
 
 The provided manuals are Bosch/BSH manufacturer documents; HomeGuide does not claim ownership or a license to redistribute them. Official download links were checked:
 
-- [WAV28EH3GB — 9001599859_B.pdf](https://media3.bosch-home.com/Documents/9001599859_B.pdf)
-- [SMS8ZDI86M — 9001722657_D.pdf](https://media3.bosch-home.com/Documents/9001722657_D.pdf)
-- [TIS 3.3. family — 8001036206_B.pdf](https://media3.bosch-home.com/Documents/8001036206_B.pdf)
+- [WAV28EH3GB — Bosch-WAV28EH3GB-Washing-Machine.pdf](https://media3.bosch-home.com/Documents/9001599859_B.pdf)
+- [SMS8ZDI86M — Bosch-SMS8ZDI86M-Dishwasher.pdf](https://media3.bosch-home.com/Documents/9001722657_D.pdf)
+- [TIS 3.3. family — Bosch-TIS-3.3-Coffee-Machine.pdf](https://media3.bosch-home.com/Documents/8001036206_B.pdf)
 
 Downloads being publicly accessible does **not** establish redistribution permission. PDFs, extracted text, caches, embeddings and indexes are ignored by Git. Keep the originals local; see [pdfs/README.md](pdfs/README.md). To add another manual, obtain permission/authorized access, inspect it, and add a manifest entry with its model, language, physical page ranges, safety pages and verified questions.
 

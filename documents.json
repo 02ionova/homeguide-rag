@@ -4,7 +4,7 @@
   "documents": [
     {
       "id": "washing-machine",
-      "filename": "9001599859_B.pdf",
+      "filename": "Bosch-WAV28EH3GB-Washing-Machine.pdf",
       "appliance": "Washing machine",
       "model": "Bosch WAV28EH3GB",
       "page_count": 60,
@@ -45,7 +45,7 @@
     },
     {
       "id": "dishwasher",
-      "filename": "9001722657_D.pdf",
+      "filename": "Bosch-SMS8ZDI86M-Dishwasher.pdf",
       "appliance": "Dishwasher",
       "model": "Bosch SMS8ZDI86M",
       "page_count": 56,
@@ -86,7 +86,7 @@
     },
     {
       "id": "coffee-machine",
-      "filename": "8001036206_B.pdf",
+      "filename": "Bosch-TIS-3.3-Coffee-Machine.pdf",
       "appliance": "Coffee machine",
       "model": "Bosch TIS 3.3. family",
       "page_count": 176,

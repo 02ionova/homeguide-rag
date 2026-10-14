@@ -1,4 +1,4 @@
-"""Run against a local server. Chat successes are explicit browser mocks, not live LLM calls."""
+"""Run against a local server. All chat requests are mocked; no live LLM calls."""
 import argparse
 import json
 from pathlib import Path
@@ -23,11 +23,16 @@ def main():
         expect(page.locator('.suggestion')).to_have_count(2)
         assert not page.evaluate('document.documentElement.scrollWidth > innerWidth')
         page.screenshot(path=str(output / 'desktop.png'), full_page=True)
+        # Never make a paid request, even when the running server has credentials.
+        page.route('**/api/chat', lambda route: route.fulfill(
+            status=503, content_type='application/json',
+            body=json.dumps({'detail': 'LLM_API_KEY is missing. Add your OpenAI API key to the local .env file and restart HomeGuide.'})))
         page.locator('#question').fill('How do I activate the child lock?')
         page.locator('#question').press('Enter')
         expect(page.locator('.message.error')).to_contain_text('LLM_API_KEY is missing')
         page.locator('#new-chat').click()
         expect(page.locator('.message')).to_have_count(0)
+        page.unroute('**/api/chat')
         # Hold the response open to verify duplicate prevention and the loading state.
         pending = []
         page.route('**/api/chat', lambda route: pending.append(route))
@@ -39,10 +44,10 @@ def main():
         expect(page.locator('#send')).to_be_disabled()
         page.locator('#question').press('Enter')
         assert len(pending) == 1
-        source = {'filename': '9001599859_B.pdf', 'page': 34, 'appliance': 'washing-machine',
+        source = {'filename': 'Bosch-WAV28EH3GB-Washing-Machine.pdf', 'page': 34, 'appliance': 'washing-machine',
                   'model': 'Bosch WAV28EH3GB', 'text': 'Press and hold the two Child Lock push 3 sec. buttons for approx. 3 seconds.',
                   'kind': 'semantic match', 'url': '/manuals/washing-machine#page=34', 'chunk_ids': []}
-        mocked = {'answer': 'Hold the two Child Lock push 3 sec. buttons for about 3 seconds. [9001599859_B.pdf, p. 34]',
+        mocked = {'answer': 'Hold the two Child Lock push 3 sec. buttons for about 3 seconds. [Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]',
                   'status': 'answered', 'sources': [source]}
         pending.pop().fulfill(status=200, content_type='application/json', body=json.dumps(mocked))
         expect(page.locator('.message.assistant .citation')).to_have_attribute('href', '/manuals/washing-machine#page=34')
@@ -55,7 +60,7 @@ def main():
         page.locator('.suggestion').first.click()
         expect(page.locator('.loading')).to_be_visible()
         pending.pop().fulfill(status=200, content_type='application/json', body=json.dumps({
-            'answer': '<img src=x onerror="window.unsafe=true"> [9001599859_B.pdf, p. 34]',
+            'answer': '<img src=x onerror="window.unsafe=true"> [Bosch-WAV28EH3GB-Washing-Machine.pdf, p. 34]',
             'status': 'answered', 'sources': [source]}))
         expect(page.locator('.message.assistant .message-body')).to_contain_text('<img')
         expect(page.locator('.message-body img')).to_have_count(0)

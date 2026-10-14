@@ -28,7 +28,7 @@ def test_startup_and_missing_index(tmp_path):
 def test_clarification_validation_and_registered_routes(tmp_path):
     pdf_dir = tmp_path / 'pdfs'
     pdf_dir.mkdir()
-    for filename in ('9001599859_B.pdf', '9001722657_D.pdf', '8001036206_B.pdf'):
+    for filename in ('Bosch-WAV28EH3GB-Washing-Machine.pdf', 'Bosch-SMS8ZDI86M-Dishwasher.pdf', 'Bosch-TIS-3.3-Coffee-Machine.pdf'):
         with pymupdf.open() as pdf:
             pdf.new_page()
             pdf.save(pdf_dir / filename)

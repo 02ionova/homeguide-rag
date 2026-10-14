@@ -99,7 +99,8 @@ function renderDocuments() {
     $('appliance-list').append(button);
     const link = element('a', 'document-link');
     link.href = doc.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-    const text = element('span', 'document-name', doc.filename);
+    link.title = doc.filename;
+    const text = element('span', 'document-name', `${doc.appliance} manual`);
     const state = doc.indexed_chunks ? 'Indexed' : doc.available ? 'Ready to index' : 'PDF missing';
     text.append(element('small', '', `${doc.page_count} pages · ${state}`));
     link.append(element('span', 'pdf-tag', 'PDF'), text);
