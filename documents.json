@@ -1,0 +1,135 @@
+{
+  "page_numbering": "1-based physical PDF pages",
+  "redistribution": "Unestablished; PDFs excluded from Git. Manufacturer retains ownership.",
+  "documents": [
+    {
+      "id": "washing-machine",
+      "filename": "9001599859_B.pdf",
+      "appliance": "Washing machine",
+      "model": "Bosch WAV28EH3GB",
+      "page_count": 60,
+      "page_ranges": [
+        [
+          1,
+          57
+        ],
+        [
+          60,
+          60
+        ]
+      ],
+      "safety_pages": [
+        7,
+        8,
+        9
+      ],
+      "diagram_pages": [],
+      "sha256": "d2e8e86bf5e4ca16cfdccf4e9d00d69ce0a1592a84bf4b72d5df987c6479e810",
+      "source_url": "https://media3.bosch-home.com/Documents/9001599859_B.pdf",
+      "language": "English",
+      "notes": "English manual. Some control icons do not extract as text.",
+      "questions": [
+        {
+          "question": "How do I activate the washing machine\u2019s child lock?",
+          "pages": [
+            34
+          ]
+        },
+        {
+          "question": "How should I clean the washing machine drum?",
+          "pages": [
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dishwasher",
+      "filename": "9001722657_D.pdf",
+      "appliance": "Dishwasher",
+      "model": "Bosch SMS8ZDI86M",
+      "page_count": 56,
+      "page_ranges": [
+        [
+          1,
+          52
+        ],
+        [
+          56,
+          56
+        ]
+      ],
+      "safety_pages": [
+        8,
+        9
+      ],
+      "diagram_pages": [],
+      "sha256": "bf1076dcd37599d864328c91e345c18e7f08d07fecb5a92e78ac9e62663976a1",
+      "source_url": "https://media3.bosch-home.com/Documents/9001722657_D.pdf",
+      "language": "English",
+      "notes": "English manual. Filter disassembly and alignment use diagrams on physical pages 40\u201341.",
+      "questions": [
+        {
+          "question": "How do I clean the dishwasher filter?",
+          "pages": [
+            40,
+            41
+          ]
+        },
+        {
+          "question": "How often should I run Machine Care?",
+          "pages": [
+            39
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coffee-machine",
+      "filename": "8001036206_B.pdf",
+      "appliance": "Coffee machine",
+      "model": "Bosch TIS 3.3. family",
+      "page_count": 176,
+      "page_ranges": [
+        [
+          1,
+          1
+        ],
+        [
+          5,
+          26
+        ]
+      ],
+      "safety_pages": [
+        7,
+        18,
+        21
+      ],
+      "diagram_pages": [
+        2,
+        3,
+        4
+      ],
+      "sha256": "a1471cafb596fd5024c9c50dbb2a7bdbe809c403f534d79781221c79a423321f",
+      "source_url": "https://media3.bosch-home.com/Documents/8001036206_B.pdf",
+      "language": "English",
+      "notes": "English section physical pages 5\u201326; shared cover page 1. Diagram-only shared pages 2\u20134 are available in the original PDF but excluded from text embeddings. French, Dutch, Polish, Czech, Russian and German sections excluded. Family designation on cover; no more specific model assumed.",
+      "questions": [
+        {
+          "question": "How do I start the coffee machine\u2019s cleaning programme?",
+          "pages": [
+            21,
+            22
+          ]
+        },
+        {
+          "question": "What should I check if coffee flows slowly?",
+          "pages": [
+            15,
+            23
+          ]
+        }
+      ]
+    }
+  ]
+}
