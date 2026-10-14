@@ -44,10 +44,14 @@ This was Chromium automation plus visual review; Safari, VoiceOver and a formal 
 
 Five milestone commits are saved locally. Every commit was preceded by staged-file review, whitespace checks and a credential-pattern scan. PDFs, extracted text, generated stores/cache, environment files and IDE settings were excluded; the pre-existing exercise was preserved locally.
 
-GitHub profile lookup succeeded for `02ionova`, but no local GitHub token/helper credential or `gh` executable was available. The connected GitHub tool set offered no repository-creation operation. Therefore no private repository URL exists and no push was performed. The exact terminal authentication and private-repository creation commands are in the README.
+GitHub profile lookup succeeded for `02ionova`, but no local GitHub token/helper credential or `gh` executable was available. The connected GitHub tool set offered no repository-creation operation. Publishing was deferred at that checkpoint; the subsequent authenticated publication is recorded below.
 
 Live generation and redistribution-authorized sample PDF inclusion remain unverified/unresolved respectively. These are the external steps needed before asserting all university completion criteria are met.
 
 ## Readable filename update
 
 Renamed all three local source PDFs to descriptive Bosch appliance/model filenames; contents and recorded hashes are unchanged. Updated manifest, citations, documentation and fixtures; official download URLs retain original manufacturer document numbers. Rebuilt the index with 346 chunks and verified the new metadata. The library displays shorter appliance-manual labels. Browser checks now mock all chat requests, including setup errors, so configured local credentials are never used by browser automation. The 31 fast checks, 3 real-manual integration checks and browser checks were repeated for this update.
+
+## Authenticated GitHub publication
+
+After the user completed GitHub CLI browser authentication for `02ionova`, created the private repository https://github.com/02ionova/homeguide-rag and connected the existing local repository as origin. Preserved all local milestone commits and used a normal push. Scanned every historical committed file version for credential patterns and the configured local API key before publishing; `.env`, PDFs and generated data remain excluded. No tests were repeated for this documentation-only publication update; the code and previously verified index are unchanged.

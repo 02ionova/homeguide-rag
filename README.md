@@ -178,18 +178,21 @@ The provided manuals are Bosch/BSH manufacturer documents; HomeGuide does not cl
 
 Downloads being publicly accessible does **not** establish redistribution permission. PDFs, extracted text, caches, embeddings and indexes are ignored by Git. Keep the originals local; see [pdfs/README.md](pdfs/README.md). To add another manual, obtain permission/authorized access, inspect it, and add a manifest entry with its model, language, physical page ranges, safety pages and verified questions.
 
-## GitHub progress
+## GitHub repository
 
-Five requested milestone commits were saved locally. There was no pre-existing repository or remote. The connected GitHub profile was available, but local `gh`/Git push credentials were absent and the GitHub connector exposed no repository-creation operation. No repository was created or pushed, and no deployment/public repository/force push was attempted.
+Private repository: [02ionova/homeguide-rag](https://github.com/02ionova/homeguide-rag). Sign in to the authorized GitHub account to view it.
 
-To enable pushes, install [GitHub CLI](https://cli.github.com/) and authenticate in your own terminal (never send credentials in chat):
+The five original implementation milestones were committed locally while GitHub authentication was unavailable. The existing history was preserved, including the later readable-filename update. After GitHub CLI authentication, the private repository was created and the commits were pushed using a normal push. No deployment, public visibility or force push was used.
+
+For future changes, from the project root:
 
 ```bash
-gh auth login --hostname github.com --git-protocol https --web
-gh auth setup-git
-gh auth status
-# Create only if this name is available; this command does not overwrite a repo.
-gh repo create homeguide-rag --private --source=. --remote=origin --push
+git status
+git add <changed-project-files>
+python -m scripts.check_staged
+git diff --cached --check
+git commit -m "Describe your change"
+git push origin main
 ```
 
-If `02ionova/homeguide-rag` already exists, inspect it first. If unrelated, use an available alternative such as `homeguide-rag-appliances`; do not overwrite it. Once the correct remote exists, use normal `git push origin main`. Every milestone was inspected with `git diff --cached --check`, staged-file review and a credential-pattern scan. Automated scanning is an aid, not exhaustive proof; `.env`, PDFs, IDE settings, local exercises and generated data are excluded.
+The local `.env` and its API key, PDFs without redistribution permission, generated vector stores/cache, virtual environments and IDE settings are excluded. All committed file versions were scanned for credential patterns and the configured local API key before the initial push. Automated scanning is an aid, not exhaustive proof; always inspect staged changes before committing.
